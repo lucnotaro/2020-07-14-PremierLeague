@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import it.polito.tdp.PremierLeague.model.Action;
+import it.polito.tdp.PremierLeague.model.ResultOfTeam;
 import it.polito.tdp.PremierLeague.model.Match;
 import it.polito.tdp.PremierLeague.model.Player;
 import it.polito.tdp.PremierLeague.model.Team;
@@ -76,6 +77,50 @@ public class PremierLeagueDAO {
 			}
 			conn.close();
 			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public List<ResultOfTeam> listAllResultOfTeamHome(){
+		String sql = "SELECT t.TeamID,t.Name, m.ResultOfTeamHome "
+				+ "FROM teams t,matches m "
+				+ "WHERE t.TeamID=m.TeamHomeID AND m.ResultOfTeamHome>=0";
+		List<ResultOfTeam> allResultHome = new ArrayList<>();
+		Connection conn = DBConnect.getConnection();
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				ResultOfTeam result=new ResultOfTeam(new Team(res.getInt("TeamID"),res.getString("Name")),res.getInt("ResultOfTeamHome"));
+				allResultHome.add(result);
+			}
+			conn.close();
+			return allResultHome;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public List<ResultOfTeam> listAllResultOfTeamAway(){
+		String sql = "SELECT t.TeamID,t.Name, m.ResultOfTeamHome "
+				+ "FROM teams t,matches m "
+				+ "WHERE t.TeamID=m.TeamAwayID AND m.ResultOfTeamHome<=0";
+		List<ResultOfTeam> allResult = new ArrayList<>();
+		Connection conn = DBConnect.getConnection();
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+				ResultOfTeam result=new ResultOfTeam(new Team(res.getInt("TeamID"),res.getString("Name")),Math.abs(res.getInt("ResultOfTeamHome")));
+				allResult.add(result);
+			}
+			conn.close();
+			return allResult;
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
